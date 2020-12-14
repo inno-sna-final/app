@@ -19,6 +19,7 @@
             -e 'PGADMIN_DEFAULT_PASSWORD' \
             -v /var/backup/app/session_data:/var/lib/pgadmin \
             -v /var/backup/app/servers.json:/pgadmin4/servers.json:ro \
+            --restart unless-stopped \
             -p 80:80 \
             dpage/pgadmin4
         sudo chown -R 5050:5050 /var/backup/
