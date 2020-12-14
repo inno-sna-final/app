@@ -1,0 +1,22 @@
+- hosts: all
+  tasks:
+    - name: Copy servers.json
+      copy:
+        src: "{{ SERVERS_FILE }}"
+        dest: /var/backup/app/servers.json
+
+    - name: Deploy using docker
+      environment:
+        PGADMIN_DEFAULT_EMAIL: "{{ EMAIL }}"
+        PGADMIN_DEFAULT_PASSWORD: "{{ PASSWORD }}"
+      shell: |-
+        docker stop app | xargs docker rm || true
+        sudo chown -R 5050:5050 /var/backup/app/
+        docker run -d \
+            --name app \
+            -e 'PGADMIN_DEFAULT_EMAIL' \
+            -e 'PGADMIN_DEFAULT_PASSWORD' \
+            -v /var/backup/app/session_data:/var/lib/pgadmin \
+            -v /var/backup/app/servers.json:/pgadmin4/servers.json:ro \
+            -p 80:80 \
+            dpage/pgadmin4
