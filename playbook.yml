@@ -1,6 +1,8 @@
 - hosts: all
   tasks:
     - name: Copy servers.json
+      become: yes
+      become_user: root
       copy:
         src: "{{ SERVERS_FILE }}"
         dest: /var/backup/app/servers.json
