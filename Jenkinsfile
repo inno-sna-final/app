@@ -17,7 +17,7 @@ pipeline {
                 eval $(ssh-agent -s)
                 cat "$SSH_PRIVATE_KEY" | tr -d '\r' |ssh-add -
                 ansible-playbook \
-                    --inventory "$ANSIBLE_INVENTORY_FILE" \
+                    --inventory "$ANSIBLE_INVENTORY" \
                     --ssh-common-args '-o StrictHostKeyChecking=no' \
                     --extra-vars "{\"SERVERS_FILE\": \"$SERVERS_FILE\", \"PASSWORD\": \"$PASSWORD\", \"EMAIL\": \"$EMAIL\"}" \
                     ./playbook.yml
