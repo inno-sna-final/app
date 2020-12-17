@@ -12,33 +12,33 @@ pipeline {
         GIT_TAG = 'REL-4_29'
     }
     stages {
-       stage('test') {
-           agent { docker 'python:3' }
-           steps {
-               sh '''
+        stage('test') {
+            agent { docker 'python:3' }
+            steps {
+                sh '''
                git clone --depth=1 -b $GIT_TAG https://github.com/postgres/pgadmin4
                cd pgadmin4
                pip install -r ./requirements.txt
                pip install -r ./web/regression/requirements.txt
                make check-pep8
                '''
-           }
-       }
-       stage('build') {
-           agent {
-               docker {
-                   image 'docker:git'
-                   args  '-v "/var/run/docker.sock:/var/run/docker.sock"'
-               }
-           }
-           steps {
-               sh '''
+            }
+        }
+        stage('build') {
+            agent {
+                docker {
+                    image 'docker:git'
+                    args  '-v "/var/run/docker.sock:/var/run/docker.sock"'
+                }
+            }
+            steps {
+                sh '''
                git clone --depth=1 -b $GIT_TAG https://github.com/postgres/pgadmin4
                cd pgadmin4
                docker build .
                '''
-           }
-       }
+            }
+        }
         stage('deploy') {
             agent { docker 'willhallonline/ansible:2.9-alpine' }
             steps {
