@@ -8,11 +8,14 @@ pipeline {
             }
             steps {
                 sh '''
+               rm -rf pgadmin4
                git clone --depth=1 -b $GIT_TAG https://github.com/postgres/pgadmin4
                cd pgadmin4
                pip install -r ./requirements.txt
                pip install -r ./web/regression/requirements.txt
                make check-pep8
+               cd ..
+               rm -rf pgadmin4
                '''
             }
         }
@@ -28,9 +31,11 @@ pipeline {
             }
             steps {
                 sh '''
-               git clone --depth=1 -b $GIT_TAG https://github.com/postgres/pgadmin4
-               cd pgadmin4
-               docker build .
+                   git clone --depth=1 -b $GIT_TAG https://github.com/postgres/pgadmin4
+                   cd pgadmin4
+                   docker build .
+                   cd ..
+                   rm -rf pgadmin4
                '''
             }
         }
