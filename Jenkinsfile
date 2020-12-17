@@ -1,19 +1,11 @@
 pipeline {
     agent none
-    environment {
-        ANSIBLE_INVENTORY = credentials('APP_ANSIBLE_INVENTORY_FILE')
-        SSH_PRIVATE_KEY   = credentials('APP_SSH_PRIVATE_KEY_FILE')
-
-        EMAIL             = credentials('APP_DEFAULT_EMAIL')
-        PASSWORD          = credentials('APP_DEFAULT_PASSWORD')
-        SERVERS_FILE      = credentials('APP_SERVERS_FILE')
-
-        VERSION = '4.29'
-        GIT_TAG = 'REL-4_29'
-    }
     stages {
         stage('test') {
             agent { docker 'python:3' }
+            environment {
+                GIT_TAG = 'REL-4_29'
+            }
             steps {
                 sh '''
                git clone --depth=1 -b $GIT_TAG https://github.com/postgres/pgadmin4
@@ -25,6 +17,9 @@ pipeline {
             }
         }
         stage('build') {
+            environment {
+                GIT_TAG = 'REL-4_29'
+            }
             agent {
                 docker {
                     image 'docker:git'
@@ -41,6 +36,16 @@ pipeline {
         }
         stage('deploy') {
             agent { docker 'willhallonline/ansible:2.9-alpine' }
+            environment {
+                ANSIBLE_INVENTORY = credentials('APP_ANSIBLE_INVENTORY_FILE')
+                SSH_PRIVATE_KEY   = credentials('APP_SSH_PRIVATE_KEY_FILE')
+
+                EMAIL             = credentials('APP_DEFAULT_EMAIL')
+                PASSWORD          = credentials('APP_DEFAULT_PASSWORD')
+                SERVERS_FILE      = credentials('APP_SERVERS_FILE')
+
+                VERSION = '4.29'
+            }
             steps {
                 sh '''
                 eval $(ssh-agent -s)
